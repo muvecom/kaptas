@@ -288,10 +288,10 @@
 
                     <div class="form-grid">
                         <div class="form-group">
-                            <label for="setor">Setor da Empresa:</label>
-                            <input type="text" id="setor" name="setor" 
-                                   placeholder="Ex: Technology, Healthcare">
-                            <div class="info-text">Setor de atuação da empresa</div>
+                            <label for="tipo_empresa">Tipo de Empresa:</label>
+                            <input type="text" id="tipo_empresa" name="tipo_empresa" 
+                                   placeholder="Ex: Private, Public, Educational">
+                            <div class="info-text">Tipo de organização</div>
                         </div>
 
                         <div class="form-group">
@@ -303,19 +303,6 @@
                     </div>
 
                     <div class="form-grid">
-                        <div class="form-group">
-                            <label for="senioridade">Senioridade:</label>
-                            <select id="senioridade" name="senioridade">
-                                <option value="">Qualquer senioridade</option>
-                                <option value="entry">Júnior</option>
-                                <option value="senior">Pleno/Sênior</option>
-                                <option value="manager">Gerente</option>
-                                <option value="director">Diretor</option>
-                                <option value="vp">VP</option>
-                                <option value="c_suite">C-Level</option>
-                            </select>
-                        </div>
-
                         <div class="form-group">
                             <label for="tamanho_empresa">Tamanho da Empresa:</label>
                             <select id="tamanho_empresa" name="tamanho_empresa">
@@ -375,10 +362,10 @@
                     q_organization_domains_list: document.getElementById('empresas_target').value.split(',').map(d => d.trim()).filter(d => d),
                     // Vaga
                     person_titles: document.getElementById('vaga').value ? [document.getElementById('vaga').value] : [],
-                    // Setor
-                    organization_industries: document.getElementById('setor').value ? [document.getElementById('setor').value] : [],
+                    // Tipo de Empresa (novo campo)
+                    organization_types: document.getElementById('tipo_empresa').value ? [document.getElementById('tipo_empresa').value] : [],
                     // Localidade
-                    person_locations: document.getElementById('localidade').value ? [document.getElementById('localidade').value + ", Brazil"] : [],                    // Senioridade                    person_seniorities: document.getElementById('senioridade').value ? [document.getElementById('senioridade').value] : [],
+                    person_locations: document.getElementById('localidade').value ? [document.getElementById('localidade').value + ", Brazil"] : [],
                     // Tamanho da empresa
                     organization_num_employees_ranges: document.getElementById('tamanho_empresa').value ? [document.getElementById('tamanho_empresa').value] : []
                 };
