@@ -296,10 +296,21 @@
 
                     <div class="form-grid">
                         <div class="form-group">
-                            <label for="tipo_empresa">Tipo de Empresa:</label>
-                            <input type="text" id="tipo_empresa" name="tipo_empresa" 
-                                   placeholder="Ex: Private, Public, Educational">
-                            <div class="info-text">Tipo de organização</div>
+                            <label for="area_empresa">Área da Empresa:</label>
+                            <select id="area_empresa" name="area_empresa">
+                                <option value="">Qualquer área</option>
+                                <option value="private_company">Empresas Privadas</option>
+                                <option value="public_company">Empresas Públicas</option>
+                                <option value="startup">Startups & Tecnologia</option>
+                                <option value="educational">Educação & Ensino</option>
+                                <option value="hospital">Saúde & Hospitalar</option>
+                                <option value="nonprofit">ONGs & Sem Fins Lucrativos</option>
+                                <option value="government_agency">Governo & Público</option>
+                                <option value="self_employed">Profissionais Autônomos</option>
+                                <option value="partnership">Sociedades & Parcerias</option>
+                                <option value="soletrader">Empreendedores Individuais</option>
+                            </select>
+                            <div class="info-text">Setor de atuação da empresa</div>
                         </div>
 
                         <div class="form-group">
@@ -353,8 +364,8 @@
                     mode: "candidates",
                     // Vaga
                     person_titles: document.getElementById('vaga').value ? [document.getElementById('vaga').value] : [],
-                    // Tipo de Empresa (novo campo)
-                    organization_types: document.getElementById('tipo_empresa').value ? [document.getElementById('tipo_empresa').value] : [],
+                    // Área da Empresa (agora é um select)
+                    organization_types: document.getElementById('area_empresa').value ? [document.getElementById('area_empresa').value] : [],
                     // Localidade
                     person_locations: document.getElementById('localidade').value ? [document.getElementById('localidade').value + ", Brazil"] : [],
                     // Tamanho da empresa
@@ -424,7 +435,7 @@
                         <div>Nome do candidato</div>
                         <div>Cargo atual</div>
                         <div>Empresa atual</div>
-                        <div>Experiência</div>
+                        <div>Email</div>
                         <div>Link no LinkedIn</div>
                     </div>
                     
@@ -433,7 +444,7 @@
                             <div class="table-cell">${contact.name || 'N/A'}</div>
                             <div class="table-cell">${contact.title || 'N/A'}</div>
                             <div class="table-cell">${contact.company_name || 'N/A'}</div>
-                            <div class="table-cell">${contact.experience || 'N/A'}</div>
+                            <div class="table-cell">${contact.email || 'N/A'}</div>
                             <div class="table-cell linkedin-cell">
                                 ${contact.linkedin_url ? `
                                     <a href="${contact.linkedin_url}" target="_blank">LinkedIn</a>
@@ -453,17 +464,17 @@
                 return;
             }
 
-            let csv = 'Nome do candidato,Cargo atual,Empresa atual,Experiência,Link no LinkedIn\n';
+            let csv = 'Nome do candidato,Cargo atual,Empresa atual,Email,Link no LinkedIn\n';
             
             contacts.forEach(contact => {
                 const cells = contact.querySelectorAll('.table-cell');
                 const name = cells[0].textContent;
                 const title = cells[1].textContent;
                 const company = cells[2].textContent;
-                const experience = cells[3].textContent;
+                const email = cells[3].textContent;
                 const linkedin = cells[4].querySelector('a')?.href || 'N/A';
                 
-                csv += `"${name}","${title}","${company}","${experience}","${linkedin}"\n`;
+                csv += `"${name}","${title}","${company}","${email}","${linkedin}"\n`;
             });
 
             const blob = new Blob([csv], { type: 'text/csv' });
