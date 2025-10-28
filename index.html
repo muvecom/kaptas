@@ -289,6 +289,27 @@
             margin-bottom: 15px;
             color: #2c3e50;
         }
+
+        .search-preview {
+            background: #e8f4fd;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 15px 0;
+            border-left: 4px solid #3498db;
+        }
+
+        .search-preview h4 {
+            margin: 0 0 8px 0;
+            color: #2c3e50;
+        }
+
+        .search-preview code {
+            background: white;
+            padding: 8px 12px;
+            border-radius: 4px;
+            font-family: monospace;
+            display: block;
+        }
     </style>
 </head>
 <body>
@@ -304,7 +325,7 @@
                 <div class="section-title">🔍 Critérios de Busca</div>
                 
                 <form id="prospectForm">
-                    <!-- CAMPOS PARA API (os 4 campos reais) -->
+                    <!-- CAMPOS PARA API (os 3 campos reais) -->
                     <div class="fields-section">
                         <div class="section-subtitle">Critérios de Busca (Enviados para a API)</div>
                         <div class="form-grid">
@@ -314,6 +335,26 @@
                                        placeholder="Ex: Software Engineer, Marketing Manager" required>
                                 <div class="info-text">Cargo desejado para a vaga</div>
                             </div>
+                            <div class="form-group">
+                                <label for="industria_empresa">Indústria da Empresa *:</label>
+                                <select id="industria_empresa" name="industria_empresa" required>
+                                    <option value="">Selecione uma indústria</option>
+                                    <option value="Technology">Tecnologia</option>
+                                    <option value="Healthcare">Saúde</option>
+                                    <option value="Education">Educação</option>
+                                    <option value="Finance">Finanças</option>
+                                    <option value="Retail">Varejo</option>
+                                    <option value="Manufacturing">Manufatura</option>
+                                    <option value="Real Estate">Imobiliário</option>
+                                    <option value="Marketing">Marketing</option>
+                                    <option value="Hospitality">Hotelaria</option>
+                                    <option value="Construction">Construção Civil</option>
+                                </select>
+                                <div class="info-text">A busca combinará cargo + indústria</div>
+                            </div>
+                        </div>
+
+                        <div class="form-grid">
                             <div class="form-group">
                                 <label for="tamanho_empresa">Tamanho da Empresa:</label>
                                 <select id="tamanho_empresa" name="tamanho_empresa">
@@ -326,33 +367,19 @@
                                     <option value="1001,10000">1000+ funcionários</option>
                                 </select>
                             </div>
-                        </div>
-
-                        <div class="form-grid">
-                            <div class="form-group">
-                                <label for="industria_empresa">Indústria da Empresa:</label>
-                                <select id="industria_empresa" name="industria_empresa">
-                                    <option value="">Qualquer indústria</option>
-                                    <option value="Technology">Tecnologia</option>
-                                    <option value="Healthcare">Saúde</option>
-                                    <option value="Education">Educação</option>
-                                    <option value="Finance">Finanças</option>
-                                    <option value="Retail">Varejo</option>
-                                    <option value="Manufacturing">Manufatura</option>
-                                    <option value="Real Estate">Imobiliário</option>
-                                    <option value="Marketing">Marketing</option>
-                                    <option value="Hospitality">Hotelaria</option>
-                                    <option value="Construction">Construção Civil</option>
-                                </select>
-                                <div class="info-text">Setor de atuação da empresa</div>
-                            </div>
 
                             <div class="form-group">
                                 <label for="localidade">Localidade:</label>
                                 <input type="text" id="localidade" name="localidade" 
                                         placeholder="Ex: São Paulo, Rio de Janeiro">
-                                <div class="info-text">Digite o estado ou cidade (será automaticamente combinado com Brazil)</div>
+                                <div class="info-text">Digite o estado ou cidade</div>
                             </div>
+                        </div>
+
+                        <!-- Preview da busca -->
+                        <div class="search-preview">
+                            <h4>🔍 Busca que será realizada:</h4>
+                            <code id="searchPreview">Preencha os campos acima para ver a busca</code>
                         </div>
                     </div>
 
@@ -432,6 +459,39 @@
     </div>
 
     <script>
+        // Atualizar preview da busca em tempo real
+        function updateSearchPreview() {
+            const vaga = document.getElementById('vaga').value;
+            const industria = document.getElementById('industria_empresa').value;
+            const localidade = document.getElementById('localidade').value;
+            const tamanho = document.getElementById('tamanho_empresa').value;
+            
+            let preview = '';
+            
+            if (vaga && industria) {
+                preview = `"${vaga} ${industria}"`;
+                
+                if (localidade) {
+                    preview += ` em ${localidade}`;
+                }
+                
+                if (tamanho) {
+                    const [min, max] = tamanho.split(',');
+                    preview += ` | Empresas com ${min}-${max} funcionários`;
+                }
+            } else {
+                preview = 'Preencha os campos acima para ver a busca';
+            }
+            
+            document.getElementById('searchPreview').textContent = preview;
+        }
+
+        // Adicionar event listeners para atualizar o preview
+        document.getElementById('vaga').addEventListener('input', updateSearchPreview);
+        document.getElementById('industria_empresa').addEventListener('change', updateSearchPreview);
+        document.getElementById('localidade').addEventListener('input', updateSearchPreview);
+        document.getElementById('tamanho_empresa').addEventListener('change', updateSearchPreview);
+
         // Form submission
         document.getElementById('prospectForm').addEventListener('submit', async function(e) {
             e.preventDefault();
@@ -446,12 +506,13 @@
             resultsContainer.innerHTML = '<div style="text-align: center; padding: 20px;">Carregando...</div>';
             
             try {
-                // Preparar dados para envio - APENAS OS 4 CAMPOS REAIS
+                // Preparar dados para envio - APENAS OS 3 CAMPOS REAIS
                 const requestData = {
                     mode: "candidates",
-                    // Vaga
-                    person_titles: document.getElementById('vaga').value ? [document.getElementById('vaga').value] : [],
-                    // Indústria da Empresa (filtro válido)
+                    // Vaga + Indústria CONCATENADOS
+                    person_titles: document.getElementById('vaga').value && document.getElementById('industria_empresa').value ? 
+                        [`${document.getElementById('vaga').value} ${document.getElementById('industria_empresa').value}`] : [],
+                    // Indústria também separada para filtro adicional
                     organization_industries: document.getElementById('industria_empresa').value ? [document.getElementById('industria_empresa').value] : [],
                     // Localidade
                     person_locations: document.getElementById('localidade').value ? [document.getElementById('localidade').value + ", Brazil"] : [],
@@ -459,15 +520,7 @@
                     organization_num_employees_ranges: document.getElementById('tamanho_empresa').value ? [document.getElementById('tamanho_empresa').value] : []
                 };
 
-                console.log('Enviando para API (apenas campos reais):', requestData);
-                console.log('Campos estéticos (NÃO enviados):', {
-                    empresa_cliente: document.getElementById('empresa_cliente').value,
-                    setor_projeto: document.getElementById('setor_projeto').value,
-                    inicio_projeto: document.getElementById('inicio_projeto').value,
-                    numero_funcionarios: document.getElementById('numero_funcionarios').value,
-                    tamanho_equipe: document.getElementById('tamanho_equipe').value,
-                    vaga_confidencial: document.getElementById('vaga_confidencial').value
-                });
+                console.log('Enviando para API (cargo + indústria concatenados):', requestData);
                 
                 // Fazer requisição POST
                 const response = await fetch('https://api.muvecom.com.br/v1/sdr/person-lookup-v2', {
@@ -509,7 +562,8 @@
             if (contacts.length === 0) {
                 resultsContainer.innerHTML = `
                     <div class="error">
-                        ❌ Nenhum candidato encontrado com os critérios especificados
+                        ❌ Nenhum candidato encontrado com os critérios especificados.
+                        Tente alterar o cargo ou a indústria.
                     </div>
                 `;
                 return;
@@ -582,6 +636,9 @@
             a.click();
             document.body.removeChild(a);
         }
+
+        // Inicializar preview
+        updateSearchPreview();
     </script>
 </body>
 </html>
