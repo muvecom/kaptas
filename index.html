@@ -296,19 +296,19 @@
 
                     <div class="form-grid">
                         <div class="form-group">
-                            <label for="area_empresa">Área da Empresa:</label>
-                            <select id="area_empresa" name="area_empresa">
-                                <option value="">Qualquer área</option>
-                                <option value="private_company">Empresas Privadas</option>
-                                <option value="public_company">Empresas Públicas</option>
-                                <option value="startup">Startups & Tecnologia</option>
-                                <option value="educational">Educação & Ensino</option>
-                                <option value="hospital">Saúde & Hospitalar</option>
-                                <option value="nonprofit">ONGs & Sem Fins Lucrativos</option>
-                                <option value="government_agency">Governo & Público</option>
-                                <option value="self_employed">Profissionais Autônomos</option>
-                                <option value="partnership">Sociedades & Parcerias</option>
-                                <option value="soletrader">Empreendedores Individuais</option>
+                            <label for="industria_empresa">Indústria da Empresa:</label>
+                            <select id="industria_empresa" name="industria_empresa">
+                                <option value="">Qualquer indústria</option>
+                                <option value="Technology">Tecnologia</option>
+                                <option value="Healthcare">Saúde</option>
+                                <option value="Education">Educação</option>
+                                <option value="Finance">Finanças</option>
+                                <option value="Retail">Varejo</option>
+                                <option value="Manufacturing">Manufatura</option>
+                                <option value="Real Estate">Imobiliário</option>
+                                <option value="Marketing">Marketing</option>
+                                <option value="Hospitality">Hotelaria</option>
+                                <option value="Construction">Construção Civil</option>
                             </select>
                             <div class="info-text">Setor de atuação da empresa</div>
                         </div>
@@ -364,8 +364,8 @@
                     mode: "candidates",
                     // Vaga
                     person_titles: document.getElementById('vaga').value ? [document.getElementById('vaga').value] : [],
-                    // Área da Empresa (agora é um select)
-                    organization_types: document.getElementById('area_empresa').value ? [document.getElementById('area_empresa').value] : [],
+                    // Indústria da Empresa (filtro válido)
+                    organization_industries: document.getElementById('industria_empresa').value ? [document.getElementById('industria_empresa').value] : [],
                     // Localidade
                     person_locations: document.getElementById('localidade').value ? [document.getElementById('localidade').value + ", Brazil"] : [],
                     // Tamanho da empresa
