@@ -106,47 +106,19 @@
                             </div>
                         </div>
 
+                        <div class="form-grid">
+                            <div class="form-group">
+                                <label for="palavra_chave">Palavra-chave:</label>
+                                <input type="text" id="palavra_chave" name="palavra_chave" 
+                                       placeholder="Ex: Python, React, Salesforce">
+                                <div class="info-text">Termos específicos para refinar a busca</div>
+                            </div>
+                        </div>
+
                         <!-- Preview da busca -->
                         <div class="search-preview">
                             <h4>🔍 Busca que será realizada:</h4>
                             <code id="searchPreview">Preencha os campos acima para ver a busca</code>
-                        </div>
-                    </div>
-
-                    <!-- CAMPOS ESTÉTICOS (NÃO enviados para API) -->
-                    <div class="fields-section">
-                        <div class="section-subtitle">Informações do Projeto (Apenas para referência)</div>
-                        <div class="form-grid-3">
-                            <div class="form-group">
-                                <label for="empresa_cliente">Empresa Cliente:</label>
-                                <input type="text" id="empresa_cliente" name="empresa_cliente" class="aesthetic-field">
-                            </div>
-                            <div class="form-group">
-                                <label for="setor_projeto">Setor do Projeto:</label>
-                                <input type="text" id="setor_projeto" name="setor_projeto" class="aesthetic-field">
-                            </div>
-                            <div class="form-group">
-                                <label for="inicio_projeto">Início do Projeto:</label>
-                                <input type="date" id="inicio_projeto" name="inicio_projeto" class="aesthetic-field">
-                            </div>
-                        </div>
-                        <div class="form-grid-3">
-                            <div class="form-group">
-                                <label for="numero_funcionarios">Número de Funcionários:</label>
-                                <input type="number" id="numero_funcionarios" name="numero_funcionarios" class="aesthetic-field">
-                            </div>
-                            <div class="form-group">
-                                <label for="tamanho_equipe">Tamanho da Equipe:</label>
-                                <input type="number" id="tamanho_equipe" name="tamanho_equipe" class="aesthetic-field">
-                            </div>
-                            <div class="form-group">
-                                <label for="vaga_confidencial">Vaga Confidencial:</label>
-                                <select id="vaga_confidencial" name="vaga_confidencial" class="aesthetic-field">
-                                    <option value="">Selecione</option>
-                                    <option value="sim">Sim</option>
-                                    <option value="nao">Não</option>
-                                </select>
-                            </div>
                         </div>
                     </div>
 
@@ -174,6 +146,7 @@
             const industria = document.getElementById('industria').value;
             const localidade = document.getElementById('localidade').value;
             const tamanho = document.getElementById('tamanho_empresa').value;
+            const palavraChave = document.getElementById('palavra_chave').value;
             
             let preview = '';
             
@@ -186,6 +159,7 @@
                 
                 if (localidade) preview += ` em ${localidade}`;
                 if (tamanho) preview += ` | ${tamanho.split(',')[0]}-${tamanho.split(',')[1]} funcionários`;
+                if (palavraChave) preview += ` | Palavra-chave: ${palavraChave}`;
             } else {
                 preview = 'Preencha os campos acima para ver a busca';
             }
@@ -198,6 +172,7 @@
         document.getElementById('industria').addEventListener('change', updateSearchPreview);
         document.getElementById('localidade').addEventListener('input', updateSearchPreview);
         document.getElementById('tamanho_empresa').addEventListener('change', updateSearchPreview);
+        document.getElementById('palavra_chave').addEventListener('input', updateSearchPreview);
 
         // Form submission
         document.getElementById('prospectForm').addEventListener('submit', async function(e) {
@@ -218,7 +193,8 @@
                     person_titles: document.getElementById('vaga').value ? [document.getElementById('vaga').value] : [],
                     industry_includes: document.getElementById('industria').value ? [document.getElementById('industria').value] : [],
                     person_locations: document.getElementById('localidade').value ? [document.getElementById('localidade').value + ", Brazil"] : [],
-                    organization_num_employees_ranges: document.getElementById('tamanho_empresa').value ? [document.getElementById('tamanho_empresa').value] : []
+                    organization_num_employees_ranges: document.getElementById('tamanho_empresa').value ? [document.getElementById('tamanho_empresa').value] : [],
+                    q_keywords: document.getElementById('palavra_chave').value || "" // Novo filtro de palavra-chave
                 };
 
                 console.log('Enviando para API:', requestData);
