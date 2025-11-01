@@ -177,23 +177,14 @@
             resultsContainer.innerHTML = '<div style="text-align: center; padding: 20px;">Carregando...</div>';
             
             try {
-                // Combinar todos os filtros de palavra-chave em um único q_keywords
-                const cargo = document.getElementById('cargo').value;
-                const especialidades = document.getElementById('especialidades').value;
-                const setor = document.getElementById('setor').value;
-                
-                let keywordQuery = '';
-                if (cargo) keywordQuery += cargo;
-                if (especialidades) keywordQuery += (keywordQuery ? ' ' : '') + especialidades;
-                if (setor) keywordQuery += (keywordQuery ? ' ' : '') + setor;
-                
-                // APENAS OS CAMPOS QUE FUNCIONAM
+                // ENVIA OS 3 CAMPOS SEPARADOS - O BACKEND VAI COMBINAR
                 const requestData = {
                     mode: "candidates",
-                    person_titles: cargo ? [cargo] : [],
+                    cargo: document.getElementById('cargo').value || "", // Novo campo
+                    especialidades: document.getElementById('especialidades').value || "", // Novo campo
+                    setor: document.getElementById('setor').value || "", // Novo campo
                     person_locations: document.getElementById('localidade').value ? [document.getElementById('localidade').value + ", Brazil"] : [],
-                    organization_num_employees_ranges: document.getElementById('tamanho_empresa').value ? [document.getElementById('tamanho_empresa').value] : [],
-                    q_keywords: keywordQuery || "" // Combina todos os filtros de palavra-chave
+                    organization_num_employees_ranges: document.getElementById('tamanho_empresa').value ? [document.getElementById('tamanho_empresa').value] : []
                 };
 
                 console.log('Enviando para API:', requestData);
