@@ -64,24 +64,26 @@
                     <!-- CAMPOS PARA API (APENAS OS QUE FUNCIONAM) -->
                     <div class="fields-section">
                         <div class="section-subtitle">Critérios de Busca (Enviados para a API)</div>
-                        <div class="form-grid">
+                        
+                        <!-- Filtros de Palavra-chave Separados -->
+                        <div class="form-grid-3">
                             <div class="form-group">
-                                <label for="vaga">Vaga/Cargo *:</label>
-                                <input type="text" id="vaga" name="vaga" 
-                                       placeholder="Ex: Software Engineer, Marketing Manager" required>
-                                <div class="info-text">Cargo desejado para a vaga</div>
+                                <label for="cargo">Cargo:</label>
+                                <input type="text" id="cargo" name="cargo" 
+                                       placeholder="Ex: Software Engineer, Marketing Manager">
+                                <div class="info-text">Busca por cargos específicos</div>
                             </div>
                             <div class="form-group">
-                                <label for="industria">Indústria (para refinar busca):</label>
-                                <select id="industria" name="industria">
-                                    <option value="">Nenhuma indústria específica</option>
-                                    <option value="Technology">Tecnologia</option>
-                                    <option value="Healthcare">Saúde</option>
-                                    <option value="Education">Educação</option>
-                                    <option value="Finance">Finanças</option>
-                                    <option value="Retail">Varejo</option>
-                                </select>
-                                <div class="info-text">Será concatenada com o cargo</div>
+                                <label for="especialidades">Especialidades:</label>
+                                <input type="text" id="especialidades" name="especialidades" 
+                                       placeholder="Ex: Python, React, Salesforce">
+                                <div class="info-text">Habilidades e especialidades</div>
+                            </div>
+                            <div class="form-group">
+                                <label for="setor">Setor:</label>
+                                <input type="text" id="setor" name="setor" 
+                                       placeholder="Ex: Tecnologia, Saúde, Educação">
+                                <div class="info-text">Setor de atuação</div>
                             </div>
                         </div>
 
@@ -103,15 +105,6 @@
                                 <input type="text" id="localidade" name="localidade" 
                                         placeholder="Ex: São Paulo, Rio de Janeiro">
                                 <div class="info-text">Digite o estado ou cidade</div>
-                            </div>
-                        </div>
-
-                        <div class="form-grid">
-                            <div class="form-group">
-                                <label for="palavra_chave">Palavra-chave:</label>
-                                <input type="text" id="palavra_chave" name="palavra_chave" 
-                                       placeholder="Ex: Python, React, Salesforce">
-                                <div class="info-text">Termos específicos para refinar a busca</div>
                             </div>
                         </div>
 
@@ -142,24 +135,21 @@
     <script>
         // Atualizar preview da busca
         function updateSearchPreview() {
-            const vaga = document.getElementById('vaga').value;
-            const industria = document.getElementById('industria').value;
+            const cargo = document.getElementById('cargo').value;
+            const especialidades = document.getElementById('especialidades').value;
+            const setor = document.getElementById('setor').value;
             const localidade = document.getElementById('localidade').value;
             const tamanho = document.getElementById('tamanho_empresa').value;
-            const palavraChave = document.getElementById('palavra_chave').value;
             
             let preview = '';
             
-            if (vaga) {
-                if (industria) {
-                    preview = `"${vaga} ${industria}"`;
-                } else {
-                    preview = `"${vaga}"`;
-                }
+            if (cargo || especialidades || setor) {
+                if (cargo) preview += `Cargo: ${cargo}`;
+                if (especialidades) preview += `${preview ? ' | ' : ''}Especialidades: ${especialidades}`;
+                if (setor) preview += `${preview ? ' | ' : ''}Setor: ${setor}`;
                 
                 if (localidade) preview += ` em ${localidade}`;
                 if (tamanho) preview += ` | ${tamanho.split(',')[0]}-${tamanho.split(',')[1]} funcionários`;
-                if (palavraChave) preview += ` | Palavra-chave: ${palavraChave}`;
             } else {
                 preview = 'Preencha os campos acima para ver a busca';
             }
@@ -167,12 +157,12 @@
             document.getElementById('searchPreview').textContent = preview;
         }
 
-        // Event listeners
-        document.getElementById('vaga').addEventListener('input', updateSearchPreview);
-        document.getElementById('industria').addEventListener('change', updateSearchPreview);
+        // Event listeners para todos os campos
+        document.getElementById('cargo').addEventListener('input', updateSearchPreview);
+        document.getElementById('especialidades').addEventListener('input', updateSearchPreview);
+        document.getElementById('setor').addEventListener('input', updateSearchPreview);
         document.getElementById('localidade').addEventListener('input', updateSearchPreview);
         document.getElementById('tamanho_empresa').addEventListener('change', updateSearchPreview);
-        document.getElementById('palavra_chave').addEventListener('input', updateSearchPreview);
 
         // Form submission
         document.getElementById('prospectForm').addEventListener('submit', async function(e) {
@@ -187,14 +177,23 @@
             resultsContainer.innerHTML = '<div style="text-align: center; padding: 20px;">Carregando...</div>';
             
             try {
+                // Combinar todos os filtros de palavra-chave em um único q_keywords
+                const cargo = document.getElementById('cargo').value;
+                const especialidades = document.getElementById('especialidades').value;
+                const setor = document.getElementById('setor').value;
+                
+                let keywordQuery = '';
+                if (cargo) keywordQuery += cargo;
+                if (especialidades) keywordQuery += (keywordQuery ? ' ' : '') + especialidades;
+                if (setor) keywordQuery += (keywordQuery ? ' ' : '') + setor;
+                
                 // APENAS OS CAMPOS QUE FUNCIONAM
                 const requestData = {
                     mode: "candidates",
-                    person_titles: document.getElementById('vaga').value ? [document.getElementById('vaga').value] : [],
-                    industry_includes: document.getElementById('industria').value ? [document.getElementById('industria').value] : [],
+                    person_titles: cargo ? [cargo] : [],
                     person_locations: document.getElementById('localidade').value ? [document.getElementById('localidade').value + ", Brazil"] : [],
                     organization_num_employees_ranges: document.getElementById('tamanho_empresa').value ? [document.getElementById('tamanho_empresa').value] : [],
-                    q_keywords: document.getElementById('palavra_chave').value || "" // Novo filtro de palavra-chave
+                    q_keywords: keywordQuery || "" // Combina todos os filtros de palavra-chave
                 };
 
                 console.log('Enviando para API:', requestData);
