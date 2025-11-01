@@ -177,14 +177,20 @@
             resultsContainer.innerHTML = '<div style="text-align: center; padding: 20px;">Carregando...</div>';
             
             try {
-                // ENVIA OS 3 CAMPOS SEPARADOS - O BACKEND VAI COMBINAR
+                // MANTÉM O FORMATO ORIGINAL - só adiciona os novos campos
+                const cargo = document.getElementById('cargo').value;
+                const especialidades = document.getElementById('especialidades').value;
+                const setor = document.getElementById('setor').value;
+                
                 const requestData = {
                     mode: "candidates",
-                    cargo: document.getElementById('cargo').value || "", // Novo campo
-                    especialidades: document.getElementById('especialidades').value || "", // Novo campo
-                    setor: document.getElementById('setor').value || "", // Novo campo
+                    person_titles: cargo ? [cargo] : [], // MANTÉM person_titles
                     person_locations: document.getElementById('localidade').value ? [document.getElementById('localidade').value + ", Brazil"] : [],
-                    organization_num_employees_ranges: document.getElementById('tamanho_empresa').value ? [document.getElementById('tamanho_empresa').value] : []
+                    organization_num_employees_ranges: document.getElementById('tamanho_empresa').value ? [document.getElementById('tamanho_empresa').value] : [],
+                    // ADICIONA OS NOVOS CAMPOS PARA O BACKEND PROCESSAR
+                    cargo: cargo || "",
+                    especialidades: especialidades || "", 
+                    setor: setor || ""
                 };
 
                 console.log('Enviando para API:', requestData);
