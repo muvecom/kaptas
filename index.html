@@ -74,43 +74,43 @@
                                 <label for="cargo">Cargo *:</label>
                                 <select id="cargo" name="cargo" required>
                                     <option value="">Selecione um cargo</option>
-                                    <option value="Developer">Developer</option>
-                                    <option value="Software Engineer">Software Engineer</option>
-                                    <option value="Frontend">Frontend</option>
-                                    <option value="Backend">Backend</option>
-                                    <option value="Full Stack">Full Stack</option>
-                                    <option value="DevOps">DevOps</option>
-                                    <option value="Data Scientist">Data Scientist</option>
-                                    <option value="Data Analyst">Data Analyst</option>
-                                    <option value="ML Engineer">ML Engineer</option>
-                                    <option value="Product Manager">Product Manager</option>
-                                    <option value="Project Manager">Project Manager</option>
+                                    <option value="Desenvolvedor">Desenvolvedor</option>
+                                    <option value="Engenheiro de Software">Engenheiro de Software</option>
+                                    <option value="Desenvolvedor Frontend">Desenvolvedor Frontend</option>
+                                    <option value="Desenvolvedor Backend">Desenvolvedor Backend</option>
+                                    <option value="Desenvolvedor Full Stack">Desenvolvedor Full Stack</option>
+                                    <option value="Engenheiro DevOps">Engenheiro DevOps</option>
+                                    <option value="Cientista de Dados">Cientista de Dados</option>
+                                    <option value="Analista de Dados">Analista de Dados</option>
+                                    <option value="Engenheiro de Machine Learning">Engenheiro de Machine Learning</option>
+                                    <option value="Gerente de Produto">Gerente de Produto</option>
+                                    <option value="Gerente de Projetos">Gerente de Projetos</option>
                                     <option value="Scrum Master">Scrum Master</option>
-                                    <option value="UX Designer">UX Designer</option>
-                                    <option value="UI Designer">UI Designer</option>
-                                    <option value="Marketing">Marketing</option>
-                                    <option value="Digital Marketing">Digital Marketing</option>
-                                    <option value="Sales">Sales</option>
-                                    <option value="Account Executive">Account Executive</option>
-                                    <option value="Business Development">Business Development</option>
-                                    <option value="Customer Success">Customer Success</option>
-                                    <option value="HR">HR</option>
-                                    <option value="Recruiter">Recruiter</option>
-                                    <option value="Finance">Finance</option>
-                                    <option value="Operations">Operations</option>
-                                    <option value="CTO">CTO</option>
-                                    <option value="CEO">CEO</option>
-                                    <option value="CFO">CFO</option>
-                                    <option value="COO">COO</option>
-                                    <option value="Analyst">Analyst</option>
-                                    <option value="Consultant">Consultant</option>
-                                    <option value="Architect">Architect</option>
-                                    <option value="Engineer">Engineer</option>
-                                    <option value="Specialist">Specialist</option>
-                                    <option value="Coordinator">Coordinator</option>
+                                    <option value="Designer UX">Designer UX</option>
+                                    <option value="Designer UI">Designer UI</option>
+                                    <option value="Gerente de Marketing">Gerente de Marketing</option>
+                                    <option value="Especialista em Marketing Digital">Especialista em Marketing Digital</option>
+                                    <option value="Gerente de Vendas">Gerente de Vendas</option>
+                                    <option value="Executivo de Contas">Executivo de Contas</option>
+                                    <option value="Gerente de Desenvolvimento de Negócios">Gerente de Desenvolvimento de Negócios</option>
+                                    <option value="Gerente de Sucesso do Cliente">Gerente de Sucesso do Cliente</option>
+                                    <option value="Gerente de RH">Gerente de RH</option>
+                                    <option value="Recrutador">Recrutador</option>
+                                    <option value="Analista Financeiro">Analista Financeiro</option>
+                                    <option value="Gerente de Operações">Gerente de Operações</option>
+                                    <option value="Diretor de Tecnologia">Diretor de Tecnologia</option>
+                                    <option value="Diretor Executivo">Diretor Executivo</option>
+                                    <option value="Diretor Financeiro">Diretor Financeiro</option>
+                                    <option value="Diretor de Operações">Diretor de Operações</option>
+                                    <option value="Analista">Analista</option>
+                                    <option value="Consultor">Consultor</option>
+                                    <option value="Arquiteto">Arquiteto</option>
+                                    <option value="Engenheiro">Engenheiro</option>
+                                    <option value="Especialista">Especialista</option>
+                                    <option value="Coordenador">Coordenador</option>
                                     <option value="Supervisor">Supervisor</option>
-                                    <option value="Director">Director</option>
-                                    <option value="Vice President">Vice President</option>
+                                    <option value="Diretor">Diretor</option>
+                                    <option value="Vice-Presidente">Vice-Presidente</option>
                                 </select>
                                 <div class="info-text">Selecione o cargo desejado</div>
                             </div>
@@ -191,6 +191,93 @@
         let currentContacts = [];
         let selectedCargo = '';
 
+        // Mapeamento de cargos PT -> EN para busca na API
+        const cargoMapping = {
+            'Desenvolvedor': 'Developer',
+            'Engenheiro de Software': 'Software Engineer',
+            'Desenvolvedor Frontend': 'Frontend Developer',
+            'Desenvolvedor Backend': 'Backend Developer', 
+            'Desenvolvedor Full Stack': 'Full Stack Developer',
+            'Engenheiro DevOps': 'DevOps Engineer',
+            'Cientista de Dados': 'Data Scientist',
+            'Analista de Dados': 'Data Analyst',
+            'Engenheiro de Machine Learning': 'Machine Learning Engineer',
+            'Gerente de Produto': 'Product Manager',
+            'Gerente de Projetos': 'Project Manager',
+            'Scrum Master': 'Scrum Master',
+            'Designer UX': 'UX Designer',
+            'Designer UI': 'UI Designer',
+            'Gerente de Marketing': 'Marketing Manager',
+            'Especialista em Marketing Digital': 'Digital Marketing Specialist',
+            'Gerente de Vendas': 'Sales Manager',
+            'Executivo de Contas': 'Account Executive',
+            'Gerente de Desenvolvimento de Negócios': 'Business Development Manager',
+            'Gerente de Sucesso do Cliente': 'Customer Success Manager',
+            'Gerente de RH': 'HR Manager',
+            'Recrutador': 'Recruiter',
+            'Analista Financeiro': 'Financial Analyst',
+            'Gerente de Operações': 'Operations Manager',
+            'Diretor de Tecnologia': 'CTO',
+            'Diretor Executivo': 'CEO',
+            'Diretor Financeiro': 'CFO',
+            'Diretor de Operações': 'COO',
+            'Analista': 'Analyst',
+            'Consultor': 'Consultant',
+            'Arquiteto': 'Architect',
+            'Engenheiro': 'Engineer',
+            'Especialista': 'Specialist',
+            'Coordenador': 'Coordinator',
+            'Supervisor': 'Supervisor',
+            'Diretor': 'Director',
+            'Vice-Presidente': 'Vice President'
+        };
+
+        // Mapeamento reverso EN -> PT para exibição
+        const reverseCargoMapping = Object.fromEntries(
+            Object.entries(cargoMapping).map(([pt, en]) => [en, pt])
+        );
+
+        // Termos de busca bilingues para cada cargo
+        const cargoSearchTerms = {
+            'Desenvolvedor': ['desenvolvedor', 'developer', 'dev'],
+            'Engenheiro de Software': ['engenheiro de software', 'software engineer', 'software developer'],
+            'Desenvolvedor Frontend': ['desenvolvedor frontend', 'frontend developer', 'front end'],
+            'Desenvolvedor Backend': ['desenvolvedor backend', 'backend developer', 'back end'],
+            'Desenvolvedor Full Stack': ['desenvolvedor full stack', 'full stack developer', 'fullstack'],
+            'Engenheiro DevOps': ['engenheiro devops', 'devops engineer'],
+            'Cientista de Dados': ['cientista de dados', 'data scientist'],
+            'Analista de Dados': ['analista de dados', 'data analyst'],
+            'Engenheiro de Machine Learning': ['engenheiro de machine learning', 'machine learning engineer', 'ml engineer'],
+            'Gerente de Produto': ['gerente de produto', 'product manager'],
+            'Gerente de Projetos': ['gerente de projetos', 'project manager'],
+            'Scrum Master': ['scrum master'],
+            'Designer UX': ['designer ux', 'ux designer'],
+            'Designer UI': ['designer ui', 'ui designer'],
+            'Gerente de Marketing': ['gerente de marketing', 'marketing manager'],
+            'Especialista em Marketing Digital': ['especialista em marketing digital', 'digital marketing specialist'],
+            'Gerente de Vendas': ['gerente de vendas', 'sales manager'],
+            'Executivo de Contas': ['executivo de contas', 'account executive'],
+            'Gerente de Desenvolvimento de Negócios': ['gerente de desenvolvimento de negócios', 'business development manager'],
+            'Gerente de Sucesso do Cliente': ['gerente de sucesso do cliente', 'customer success manager'],
+            'Gerente de RH': ['gerente de rh', 'hr manager', 'human resources'],
+            'Recrutador': ['recrutador', 'recruiter'],
+            'Analista Financeiro': ['analista financeiro', 'financial analyst'],
+            'Gerente de Operações': ['gerente de operações', 'operations manager'],
+            'Diretor de Tecnologia': ['diretor de tecnologia', 'cto', 'chief technology officer'],
+            'Diretor Executivo': ['diretor executivo', 'ceo', 'chief executive officer'],
+            'Diretor Financeiro': ['diretor financeiro', 'cfo', 'chief financial officer'],
+            'Diretor de Operações': ['diretor de operações', 'coo', 'chief operations officer'],
+            'Analista': ['analista', 'analyst'],
+            'Consultor': ['consultor', 'consultant'],
+            'Arquiteto': ['arquiteto', 'architect'],
+            'Engenheiro': ['engenheiro', 'engineer'],
+            'Especialista': ['especialista', 'specialist'],
+            'Coordenador': ['coordenador', 'coordinator'],
+            'Supervisor': ['supervisor'],
+            'Diretor': ['diretor', 'director'],
+            'Vice-Presidente': ['vice-presidente', 'vice president']
+        };
+
         // Atualizar preview da busca
         function updateSearchPreview() {
             const cargo = document.getElementById('cargo').value;
@@ -224,15 +311,24 @@
             document.getElementById('searchPreview').textContent = preview;
         }
 
-        // Função para verificar se um cargo contém o termo de busca
-        function cargoContains(cargo, searchTerm) {
-            if (!cargo || !searchTerm) return false;
+        // Função para verificar match bilingue de cargos
+        function cargoMatches(cargo, searchCargo) {
+            if (!cargo || !searchCargo) return false;
             
             const cargoLower = cargo.toLowerCase().trim();
-            const searchLower = searchTerm.toLowerCase().trim();
+            const searchLower = searchCargo.toLowerCase().trim();
             
-            // Busca por contains (mais flexível)
-            return cargoLower.includes(searchLower);
+            // Busca direta por contains
+            if (cargoLower.includes(searchLower)) return true;
+            
+            // Busca nos termos bilingues
+            if (cargoSearchTerms[searchCargo]) {
+                return cargoSearchTerms[searchCargo].some(term => 
+                    cargoLower.includes(term.toLowerCase())
+                );
+            }
+            
+            return false;
         }
 
         // Filtrar resultados por cargo
@@ -240,7 +336,7 @@
             const filterCargo = document.getElementById('filterCargo').value;
             
             const filteredContacts = filterCargo ? 
-                currentContacts.filter(contact => cargoContains(contact.title, filterCargo)) : 
+                currentContacts.filter(contact => cargoMatches(contact.title, filterCargo)) : 
                 currentContacts;
 
             displayFilteredResults(filteredContacts, filterCargo);
@@ -259,7 +355,7 @@
 
             resultsContainer.innerHTML = `
                 <div class="results-header">
-                    <div class="results-count">📊 ${contacts.length} candidatos ${filterCargo ? `com cargo contendo "${filterCargo}"` : 'encontrados'}</div>
+                    <div class="results-count">📊 ${contacts.length} candidatos ${filterCargo ? `com cargo "${filterCargo}"` : 'encontrados'}</div>
                     <button class="export-btn" onclick="exportToCSV()">📥 Exportar para CSV</button>
                 </div>
                 <div class="contacts-table">
@@ -334,9 +430,12 @@
                     personLocations.push("Brazil"); // SEMPRE tem Brazil
                 }
                 
+                // Converte cargo PT para EN para API
+                const cargoForAPI = cargoMapping[selectedCargo] || selectedCargo;
+                
                 const requestData = {
                     mode: "candidates",
-                    person_titles: selectedCargo ? [selectedCargo] : [],
+                    person_titles: cargoForAPI ? [cargoForAPI] : [],
                     person_locations: personLocations, // Agora sempre tem Brazil
                     organization_num_employees_ranges: document.getElementById('tamanho_empresa').value ? [document.getElementById('tamanho_empresa').value] : [],
                     cargo: selectedCargo || "",
@@ -395,7 +494,7 @@
         function exportToCSV() {
             const filterCargo = document.getElementById('filterCargo').value;
             const contactsToExport = filterCargo ? 
-                currentContacts.filter(contact => cargoContains(contact.title, filterCargo)) : 
+                currentContacts.filter(contact => cargoMatches(contact.title, filterCargo)) : 
                 currentContacts;
 
             if (contactsToExport.length === 0) return alert('Nenhum candidato para exportar');
