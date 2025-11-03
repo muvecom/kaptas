@@ -46,6 +46,9 @@
         .search-preview { background: #e8f4fd; padding: 15px; border-radius: 8px; margin: 15px 0; border-left: 4px solid #3498db; }
         .search-preview h4 { margin: 0 0 8px 0; color: #2c3e50; }
         .search-preview code { background: white; padding: 8px 12px; border-radius: 4px; font-family: monospace; display: block; }
+        .filter-controls { background: #e8f4fd; padding: 15px; border-radius: 8px; margin: 15px 0; border-left: 4px solid #e74c3c; }
+        .filter-controls label { display: inline-block; margin-right: 15px; font-weight: 600; }
+        .filter-select { width: auto; display: inline-block; margin-right: 20px; min-width: 200px; }
     </style>
 </head>
 <body>
@@ -68,10 +71,39 @@
                         <!-- Filtros de Palavra-chave Separados -->
                         <div class="form-grid-3">
                             <div class="form-group">
-                                <label for="cargo">Cargo:</label>
-                                <input type="text" id="cargo" name="cargo" 
-                                       placeholder="Ex: Software Engineer, Marketing Manager">
-                                <div class="info-text">Busca por cargos específicos</div>
+                                <label for="cargo">Cargo *:</label>
+                                <select id="cargo" name="cargo" required>
+                                    <option value="">Selecione um cargo</option>
+                                    <option value="Software Engineer">Software Engineer</option>
+                                    <option value="Senior Software Engineer">Senior Software Engineer</option>
+                                    <option value="Full Stack Developer">Full Stack Developer</option>
+                                    <option value="Frontend Developer">Frontend Developer</option>
+                                    <option value="Backend Developer">Backend Developer</option>
+                                    <option value="DevOps Engineer">DevOps Engineer</option>
+                                    <option value="Data Scientist">Data Scientist</option>
+                                    <option value="Data Analyst">Data Analyst</option>
+                                    <option value="Machine Learning Engineer">Machine Learning Engineer</option>
+                                    <option value="Product Manager">Product Manager</option>
+                                    <option value="Project Manager">Project Manager</option>
+                                    <option value="Scrum Master">Scrum Master</option>
+                                    <option value="UX/UI Designer">UX/UI Designer</option>
+                                    <option value="Product Designer">Product Designer</option>
+                                    <option value="Marketing Manager">Marketing Manager</option>
+                                    <option value="Digital Marketing Specialist">Digital Marketing Specialist</option>
+                                    <option value="Sales Manager">Sales Manager</option>
+                                    <option value="Account Executive">Account Executive</option>
+                                    <option value="Business Development Manager">Business Development Manager</option>
+                                    <option value="Customer Success Manager">Customer Success Manager</option>
+                                    <option value="HR Manager">HR Manager</option>
+                                    <option value="Recruiter">Recruiter</option>
+                                    <option value="Financial Analyst">Financial Analyst</option>
+                                    <option value="Operations Manager">Operations Manager</option>
+                                    <option value="CTO">CTO</option>
+                                    <option value="CEO">CEO</option>
+                                    <option value="CFO">CFO</option>
+                                    <option value="COO">COO</option>
+                                </select>
+                                <div class="info-text">Selecione o cargo desejado</div>
                             </div>
                             <div class="form-group">
                                 <label for="especialidades">Especialidades:</label>
@@ -89,15 +121,19 @@
 
                         <div class="form-grid">
                             <div class="form-group">
-                                <label for="tamanho_empresa">Tamanho da Empresa:</label>
+                                <label for="tamanho_empresa">Tamanho Mínimo da Empresa:</label>
                                 <select id="tamanho_empresa" name="tamanho_empresa">
                                     <option value="">Qualquer tamanho</option>
-                                    <option value="1,10">1-10 funcionários</option>
-                                    <option value="11,50">11-50 funcionários</option>
-                                    <option value="51,200">51-200 funcionários</option>
-                                    <option value="201,500">201-500 funcionários</option>
-                                    <option value="501,1000">501-1000 funcionários</option>
+                                    <option value="1,">1+ funcionários</option>
+                                    <option value="10,">10+ funcionários</option>
+                                    <option value="50,">50+ funcionários</option>
+                                    <option value="100,">100+ funcionários</option>
+                                    <option value="200,">200+ funcionários</option>
+                                    <option value="500,">500+ funcionários</option>
+                                    <option value="1000,">1000+ funcionários</option>
+                                    <option value="5000,">5000+ funcionários</option>
                                 </select>
+                                <div class="info-text">Número mínimo de funcionários</div>
                             </div>
 
                             <div class="form-group">
@@ -111,7 +147,7 @@
                         <!-- Preview da busca -->
                         <div class="search-preview">
                             <h4>🔍 Busca que será realizada:</h4>
-                            <code id="searchPreview">Preencha os campos acima para ver a busca</code>
+                            <code id="searchPreview">Selecione um cargo para ver a busca</code>
                         </div>
                     </div>
 
@@ -122,6 +158,16 @@
 
             <div class="results-section">
                 <div class="section-title">📊 Resultados</div>
+                
+                <!-- Controles de Filtro -->
+                <div class="filter-controls" id="filterControls" style="display: none;">
+                    <label for="filterCargo">Filtrar por cargo:</label>
+                    <select id="filterCargo" class="filter-select">
+                        <option value="">Todos os cargos</option>
+                    </select>
+                    <span id="filteredCount" style="font-weight: 600; color: #2c3e50;"></span>
+                </div>
+                
                 <div id="resultsContainer">
                     <div class="empty-state">
                         <div class="empty-state-icon">🔍</div>
@@ -133,6 +179,9 @@
     </div>
 
     <script>
+        let currentContacts = [];
+        let selectedCargo = '';
+
         // Atualizar preview da busca
         function updateSearchPreview() {
             const cargo = document.getElementById('cargo').value;
@@ -149,84 +198,41 @@
                 if (setor) preview += `${preview ? ' | ' : ''}Setor: ${setor}`;
                 
                 if (localidade) preview += ` em ${localidade}`;
-                if (tamanho) preview += ` | ${tamanho.split(',')[0]}-${tamanho.split(',')[1]} funcionários`;
+                if (tamanho) {
+                    const minSize = tamanho.replace(',', '');
+                    preview += ` | Empresas com ${minSize}+ funcionários`;
+                }
             } else {
-                preview = 'Preencha os campos acima para ver a busca';
+                preview = 'Selecione um cargo para ver a busca';
             }
             
             document.getElementById('searchPreview').textContent = preview;
         }
 
-        // Event listeners para todos os campos
-        document.getElementById('cargo').addEventListener('input', updateSearchPreview);
-        document.getElementById('especialidades').addEventListener('input', updateSearchPreview);
-        document.getElementById('setor').addEventListener('input', updateSearchPreview);
-        document.getElementById('localidade').addEventListener('input', updateSearchPreview);
-        document.getElementById('tamanho_empresa').addEventListener('change', updateSearchPreview);
+        // Filtrar resultados por cargo
+        function filterResultsByCargo() {
+            const filterCargo = document.getElementById('filterCargo').value;
+            const filteredContacts = filterCargo ? 
+                currentContacts.filter(contact => contact.title && contact.title.toLowerCase().includes(filterCargo.toLowerCase())) : 
+                currentContacts;
 
-        // Form submission
-        document.getElementById('prospectForm').addEventListener('submit', async function(e) {
-            e.preventDefault();
-            
-            const submitBtn = document.getElementById('submitBtn');
-            const loading = document.getElementById('loading');
+            displayFilteredResults(filteredContacts, filterCargo);
+        }
+
+        // Exibir resultados filtrados
+        function displayFilteredResults(contacts, filterCargo = '') {
             const resultsContainer = document.getElementById('resultsContainer');
-            
-            submitBtn.disabled = true;
-            loading.style.display = 'block';
-            resultsContainer.innerHTML = '<div style="text-align: center; padding: 20px;">Carregando...</div>';
-            
-            try {
-                // MANTÉM O FORMATO ORIGINAL - só adiciona os novos campos
-                const cargo = document.getElementById('cargo').value;
-                const especialidades = document.getElementById('especialidades').value;
-                const setor = document.getElementById('setor').value;
-                
-                const requestData = {
-                    mode: "candidates",
-                    person_titles: cargo ? [cargo] : [], // MANTÉM person_titles
-                    person_locations: document.getElementById('localidade').value ? [document.getElementById('localidade').value + ", Brazil"] : [],
-                    organization_num_employees_ranges: document.getElementById('tamanho_empresa').value ? [document.getElementById('tamanho_empresa').value] : [],
-                    // ADICIONA OS NOVOS CAMPOS PARA O BACKEND PROCESSAR
-                    cargo: cargo || "",
-                    especialidades: especialidades || "", 
-                    setor: setor || ""
-                };
+            const filteredCount = document.getElementById('filteredCount');
 
-                console.log('Enviando para API:', requestData);
-                
-                const response = await fetch('https://api.muvecom.com.br/v1/sdr/person-lookup-v2', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(requestData)
-                });
-
-                if (!response.ok) throw new Error(`Erro HTTP: ${response.status}`);
-                
-                const responseData = await response.json();
-                displayResults(responseData);
-                
-            } catch (error) {
-                console.error('Erro:', error);
-                resultsContainer.innerHTML = `<div class="error">❌ Erro na busca: ${error.message}</div>`;
-            } finally {
-                submitBtn.disabled = false;
-                loading.style.display = 'none';
-            }
-        });
-
-        function displayResults(data) {
-            const resultsContainer = document.getElementById('resultsContainer');
-            const contacts = data.contacts || [];
-            
             if (contacts.length === 0) {
-                resultsContainer.innerHTML = `<div class="error">❌ Nenhum candidato encontrado</div>`;
+                resultsContainer.innerHTML = `<div class="error">❌ Nenhum candidato encontrado ${filterCargo ? `para "${filterCargo}"` : ''}</div>`;
+                if (filteredCount) filteredCount.textContent = '';
                 return;
             }
 
             resultsContainer.innerHTML = `
                 <div class="results-header">
-                    <div class="results-count">📊 ${contacts.length} candidatos encontrados</div>
+                    <div class="results-count">📊 ${contacts.length} candidatos ${filterCargo ? `com cargo "${filterCargo}"` : 'encontrados'}</div>
                     <button class="export-btn" onclick="exportToCSV()">📥 Exportar para CSV</button>
                 </div>
                 <div class="contacts-table">
@@ -246,23 +252,128 @@
                     `).join('')}
                 </div>
             `;
+
+            if (filteredCount) {
+                filteredCount.textContent = filterCargo ? 
+                    `(${contacts.length} de ${currentContacts.length} candidatos)` : 
+                    `(${contacts.length} candidatos totais)`;
+            }
+        }
+
+        // Popular dropdown de filtro com cargos únicos
+        function populateCargoFilter(contacts) {
+            const cargoFilter = document.getElementById('filterCargo');
+            const cargos = [...new Set(contacts.map(contact => contact.title).filter(Boolean))].sort();
+            
+            cargoFilter.innerHTML = '<option value="">Todos os cargos</option>';
+            cargos.forEach(cargo => {
+                cargoFilter.innerHTML += `<option value="${cargo}">${cargo}</option>`;
+            });
+        }
+
+        // Event listeners para todos os campos
+        document.getElementById('cargo').addEventListener('change', updateSearchPreview);
+        document.getElementById('especialidades').addEventListener('input', updateSearchPreview);
+        document.getElementById('setor').addEventListener('input', updateSearchPreview);
+        document.getElementById('localidade').addEventListener('input', updateSearchPreview);
+        document.getElementById('tamanho_empresa').addEventListener('change', updateSearchPreview);
+        document.getElementById('filterCargo').addEventListener('change', filterResultsByCargo);
+
+        // Form submission
+        document.getElementById('prospectForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const submitBtn = document.getElementById('submitBtn');
+            const loading = document.getElementById('loading');
+            const resultsContainer = document.getElementById('resultsContainer');
+            const filterControls = document.getElementById('filterControls');
+            
+            submitBtn.disabled = true;
+            loading.style.display = 'block';
+            resultsContainer.innerHTML = '<div style="text-align: center; padding: 20px;">Carregando...</div>';
+            filterControls.style.display = 'none';
+            
+            try {
+                selectedCargo = document.getElementById('cargo').value;
+                const especialidades = document.getElementById('especialidades').value;
+                const setor = document.getElementById('setor').value;
+                
+                const requestData = {
+                    mode: "candidates",
+                    person_titles: selectedCargo ? [selectedCargo] : [],
+                    person_locations: document.getElementById('localidade').value ? [document.getElementById('localidade').value + ", Brazil"] : [],
+                    organization_num_employees_ranges: document.getElementById('tamanho_empresa').value ? [document.getElementById('tamanho_empresa').value] : [],
+                    cargo: selectedCargo || "",
+                    especialidades: especialidades || "", 
+                    setor: setor || ""
+                };
+
+                console.log('Enviando para API:', requestData);
+                
+                const response = await fetch('https://api.muvecom.com.br/v1/sdr/person-lookup-v2', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(requestData)
+                });
+
+                if (!response.ok) throw new Error(`Erro HTTP: ${response.status}`);
+                
+                const responseData = await response.json();
+                currentContacts = responseData.contacts || [];
+                
+                // Mostrar controles de filtro se houver resultados
+                if (currentContacts.length > 0) {
+                    filterControls.style.display = 'block';
+                    populateCargoFilter(currentContacts);
+                    
+                    // Filtrar automaticamente pelo cargo selecionado na busca
+                    if (selectedCargo) {
+                        document.getElementById('filterCargo').value = selectedCargo;
+                    }
+                    filterResultsByCargo();
+                } else {
+                    displayResults(responseData);
+                }
+                
+            } catch (error) {
+                console.error('Erro:', error);
+                resultsContainer.innerHTML = `<div class="error">❌ Erro na busca: ${error.message}</div>`;
+            } finally {
+                submitBtn.disabled = false;
+                loading.style.display = 'none';
+            }
+        });
+
+        function displayResults(data) {
+            const resultsContainer = document.getElementById('resultsContainer');
+            const contacts = data.contacts || [];
+            
+            if (contacts.length === 0) {
+                resultsContainer.innerHTML = `<div class="error">❌ Nenhum candidato encontrado</div>`;
+                return;
+            }
+
+            displayFilteredResults(contacts);
         }
 
         function exportToCSV() {
-            const contacts = document.querySelectorAll('.table-row');
-            if (contacts.length === 0) return alert('Nenhum candidato para exportar');
+            const filterCargo = document.getElementById('filterCargo').value;
+            const contactsToExport = filterCargo ? 
+                currentContacts.filter(contact => contact.title && contact.title.toLowerCase().includes(filterCargo.toLowerCase())) : 
+                currentContacts;
+
+            if (contactsToExport.length === 0) return alert('Nenhum candidato para exportar');
             
             let csv = 'Nome,Cargo,Empresa,Email,LinkedIn\n';
-            contacts.forEach(contact => {
-                const cells = contact.querySelectorAll('.table-cell');
-                csv += `"${cells[0].textContent}","${cells[1].textContent}","${cells[2].textContent}","${cells[3].textContent}","${cells[4].querySelector('a')?.href || 'N/A'}"\n`;
+            contactsToExport.forEach(contact => {
+                csv += `"${contact.name || 'N/A'}","${contact.title || 'N/A'}","${contact.company_name || 'N/A'}","${contact.email || 'N/A'}","${contact.linkedin_url || 'N/A'}"\n`;
             });
 
             const blob = new Blob([csv], { type: 'text/csv' });
             const url = window.URL.createObjectURL(blob);
             const a = document.createElement('a');
             a.href = url;
-            a.download = 'candidatos_kaptas.csv';
+            a.download = `candidatos_${filterCargo || 'todos'}.csv`;
             document.body.appendChild(a);
             a.click();
             document.body.removeChild(a);
