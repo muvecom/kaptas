@@ -74,34 +74,43 @@
                                 <label for="cargo">Cargo *:</label>
                                 <select id="cargo" name="cargo" required>
                                     <option value="">Selecione um cargo</option>
+                                    <option value="Developer">Developer</option>
                                     <option value="Software Engineer">Software Engineer</option>
-                                    <option value="Senior Software Engineer">Senior Software Engineer</option>
-                                    <option value="Full Stack Developer">Full Stack Developer</option>
-                                    <option value="Frontend Developer">Frontend Developer</option>
-                                    <option value="Backend Developer">Backend Developer</option>
-                                    <option value="DevOps Engineer">DevOps Engineer</option>
+                                    <option value="Frontend">Frontend</option>
+                                    <option value="Backend">Backend</option>
+                                    <option value="Full Stack">Full Stack</option>
+                                    <option value="DevOps">DevOps</option>
                                     <option value="Data Scientist">Data Scientist</option>
                                     <option value="Data Analyst">Data Analyst</option>
-                                    <option value="Machine Learning Engineer">Machine Learning Engineer</option>
+                                    <option value="ML Engineer">ML Engineer</option>
                                     <option value="Product Manager">Product Manager</option>
                                     <option value="Project Manager">Project Manager</option>
                                     <option value="Scrum Master">Scrum Master</option>
-                                    <option value="UX/UI Designer">UX/UI Designer</option>
-                                    <option value="Product Designer">Product Designer</option>
-                                    <option value="Marketing Manager">Marketing Manager</option>
-                                    <option value="Digital Marketing Specialist">Digital Marketing Specialist</option>
-                                    <option value="Sales Manager">Sales Manager</option>
+                                    <option value="UX Designer">UX Designer</option>
+                                    <option value="UI Designer">UI Designer</option>
+                                    <option value="Marketing">Marketing</option>
+                                    <option value="Digital Marketing">Digital Marketing</option>
+                                    <option value="Sales">Sales</option>
                                     <option value="Account Executive">Account Executive</option>
-                                    <option value="Business Development Manager">Business Development Manager</option>
-                                    <option value="Customer Success Manager">Customer Success Manager</option>
-                                    <option value="HR Manager">HR Manager</option>
+                                    <option value="Business Development">Business Development</option>
+                                    <option value="Customer Success">Customer Success</option>
+                                    <option value="HR">HR</option>
                                     <option value="Recruiter">Recruiter</option>
-                                    <option value="Financial Analyst">Financial Analyst</option>
-                                    <option value="Operations Manager">Operations Manager</option>
+                                    <option value="Finance">Finance</option>
+                                    <option value="Operations">Operations</option>
                                     <option value="CTO">CTO</option>
                                     <option value="CEO">CEO</option>
                                     <option value="CFO">CFO</option>
                                     <option value="COO">COO</option>
+                                    <option value="Analyst">Analyst</option>
+                                    <option value="Consultant">Consultant</option>
+                                    <option value="Architect">Architect</option>
+                                    <option value="Engineer">Engineer</option>
+                                    <option value="Specialist">Specialist</option>
+                                    <option value="Coordinator">Coordinator</option>
+                                    <option value="Supervisor">Supervisor</option>
+                                    <option value="Director">Director</option>
+                                    <option value="Vice President">Vice President</option>
                                 </select>
                                 <div class="info-text">Selecione o cargo desejado</div>
                             </div>
@@ -197,7 +206,7 @@
                 if (especialidades) preview += `${preview ? ' | ' : ''}Especialidades: ${especialidades}`;
                 if (setor) preview += `${preview ? ' | ' : ''}Setor: ${setor}`;
                 
-                // CORREÇÃO: Sempre mostra Brazil no preview
+                // SEMPRE mostra Brazil no preview
                 if (localidade) {
                     preview += ` em ${localidade}, Brazil`;
                 } else {
@@ -214,11 +223,24 @@
             
             document.getElementById('searchPreview').textContent = preview;
         }
+
+        // Função para verificar se um cargo contém o termo de busca
+        function cargoContains(cargo, searchTerm) {
+            if (!cargo || !searchTerm) return false;
+            
+            const cargoLower = cargo.toLowerCase().trim();
+            const searchLower = searchTerm.toLowerCase().trim();
+            
+            // Busca por contains (mais flexível)
+            return cargoLower.includes(searchLower);
+        }
+
         // Filtrar resultados por cargo
         function filterResultsByCargo() {
             const filterCargo = document.getElementById('filterCargo').value;
+            
             const filteredContacts = filterCargo ? 
-                currentContacts.filter(contact => contact.title && contact.title.toLowerCase().includes(filterCargo.toLowerCase())) : 
+                currentContacts.filter(contact => cargoContains(contact.title, filterCargo)) : 
                 currentContacts;
 
             displayFilteredResults(filteredContacts, filterCargo);
@@ -237,7 +259,7 @@
 
             resultsContainer.innerHTML = `
                 <div class="results-header">
-                    <div class="results-count">📊 ${contacts.length} candidatos ${filterCargo ? `com cargo "${filterCargo}"` : 'encontrados'}</div>
+                    <div class="results-count">📊 ${contacts.length} candidatos ${filterCargo ? `com cargo contendo "${filterCargo}"` : 'encontrados'}</div>
                     <button class="export-btn" onclick="exportToCSV()">📥 Exportar para CSV</button>
                 </div>
                 <div class="contacts-table">
@@ -321,7 +343,7 @@
                     especialidades: especialidades || "", 
                     setor: setor || ""
                 };
-        
+
                 console.log('Enviando para API:', requestData);
                 
                 const response = await fetch('https://api.muvecom.com.br/v1/sdr/person-lookup-v2', {
@@ -329,7 +351,7 @@
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify(requestData)
                 });
-        
+
                 if (!response.ok) throw new Error(`Erro HTTP: ${response.status}`);
                 
                 const responseData = await response.json();
@@ -357,7 +379,7 @@
                 loading.style.display = 'none';
             }
         });
-        
+
         function displayResults(data) {
             const resultsContainer = document.getElementById('resultsContainer');
             const contacts = data.contacts || [];
@@ -373,7 +395,7 @@
         function exportToCSV() {
             const filterCargo = document.getElementById('filterCargo').value;
             const contactsToExport = filterCargo ? 
-                currentContacts.filter(contact => contact.title && contact.title.toLowerCase().includes(filterCargo.toLowerCase())) : 
+                currentContacts.filter(contact => cargoContains(contact.title, filterCargo)) : 
                 currentContacts;
 
             if (contactsToExport.length === 0) return alert('Nenhum candidato para exportar');
